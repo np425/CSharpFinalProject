@@ -1,0 +1,36 @@
+@page "/login"
+@using CSharpFinalProject.Data
+@inject UserService UserService
+
+<PageTitle>Login</PageTitle>
+
+<h1>Login</h1>
+
+<ul>
+    @foreach (var user in Users)
+    {
+        <li>@user.Username</li>
+    }
+</ul>
+
+<input @bind="Name"></input>
+<button @onclick="AddName">Add new user</button>
+
+@code {
+    private List<User> Users;
+    private string? Name;
+
+    private void AddName()
+    {
+        if (Name != null)
+        {
+            Users.Add(new User(Name));
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = (await UserService.GetUsersAsync()).ToList();
+    }
+
+}
