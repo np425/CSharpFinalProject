@@ -1,6 +1,7 @@
 ﻿@page "/fetchdata"
 @using CSharpFinalProject.Data
 @inject WeatherForecastService ForecastService
+@attribute [Authorize(Roles = "Administrator")]
 
 <PageTitle>Weather forecast</PageTitle>
 

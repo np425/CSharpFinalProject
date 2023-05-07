@@ -10,8 +10,8 @@ public class UserService
     {
         return Task.FromResult(new User[]
         {
-            new("jack"),
-            new("james")
+            new("jack", "abc", 1),
+            new("james", "abc", 2)
         });
     }
 }
