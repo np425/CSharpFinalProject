@@ -12,7 +12,7 @@ public class GradeSystemStoreContext: DbContext
     
     public DbSet<User> Users { get; set; }
     
-    public DbSet<Grade> Grades { get; set; }
+    public DbSet<StudentGrade> StudentGrades { get; set; }
     
     public DbSet<SubjectMember> SubjectsMembers { get; set; }
 
@@ -20,15 +20,5 @@ public class GradeSystemStoreContext: DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<SubjectMember>().HasKey(member => new
-        {
-            member.SubjectId,
-            member.UserId
-        });
-
-        // modelBuilder.Entity<User>()
-        //     .HasMany(u => u.Subjects)
-        //     .WithMany(s => s.Users)
-        //     .UsingEntity<SubjectMember>();
     }
 }

@@ -1,4 +1,5 @@
 @page "/user/{Id:int}"
+@using CSharpFinalProject.Data
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 
@@ -7,16 +8,40 @@
 <a>You're at id: @Id</a>
 <a>Username: @_user?.Username </a>
 
+<h3>Student in</h3>
+@if (_subjectsWithMemberRoles.Count != 0)
+{
+    <ul>
+        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.MemberRole == SubjectMemberRole.Student))
+        {
+            <li>@subject.Subject.Name</li>
+        }
+    </ul>
+}
+
+<h3>Teacher in</h3>
+@if (_subjectsWithMemberRoles.Count != 0)
+{
+    <ul>
+        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.MemberRole == SubjectMemberRole.Teacher))
+        {
+            <li>@subject.Subject.Name</li>
+        }
+    </ul>
+}
+
 @code {
 
     [Parameter]
     public int Id { get; set; }
 
     private Data.User? _user;
+    private List<SubjectWithMemberRole> _subjectsWithMemberRoles = new();
 
     protected override async Task OnParametersSetAsync()
     {
         _user = await HttpClient.GetFromJsonAsync<Data.User>(NavigationManager.BaseUri + $"api/users/{Id}");
+        _subjectsWithMemberRoles = await HttpClient.GetFromJsonAsync<List<SubjectWithMemberRole>>(NavigationManager.BaseUri + $"api/users/{Id}/subjects") ?? _subjectsWithMemberRoles;
     }
 
 }

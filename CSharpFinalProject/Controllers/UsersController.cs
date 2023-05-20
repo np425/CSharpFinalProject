@@ -24,18 +24,30 @@ public class UsersController
         return await users.ToListAsync();
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<User>> GetUser(int id)
+    [HttpGet("{userId:int}")]
+    public async Task<ActionResult<User>> GetUser(int userId)
     {
-        var user = await _db.Users.FindAsync(id);
+        var user = await _db.Users.FindAsync(userId);
 
         return user;
     }
 
-    [HttpGet("{id:int}/subjects")]
-    public async Task<ActionResult<List<SubjectMember>>> GetSubjects(int id)
+    [HttpGet("{userId:int}/subjects/")]
+    public async Task<ActionResult<List<SubjectWithMemberRole>>> GetSubjects(int userId)
     {
         var members = _db.SubjectsMembers;
-        return await (from member in members select member).ToListAsync();
+        var subjects = _db.Subjects;
+
+        var result = await (from member in members
+                join subject in subjects on member.SubjectId equals subject.Id
+                where member.UserId == userId
+                select new SubjectWithMemberRole
+                {
+                    Subject = subject,
+                    MemberRole = member.Role
+                })
+            .ToListAsync();
+
+        return result;
     }
 }

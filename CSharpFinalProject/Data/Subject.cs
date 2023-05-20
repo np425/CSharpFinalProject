@@ -12,8 +12,6 @@ public class Subject
     
     public string? Name { get; set; }
     public string? Description { get; set; }
-    
-    public List<SubjectMember> Members { get; set; }
 
     // public int Id { get; set; }
     // public int TeacherId { get; set; }

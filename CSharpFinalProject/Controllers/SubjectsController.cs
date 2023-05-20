@@ -42,4 +42,10 @@ public class SubjectsController
         
         return foundMembers;
     }
+
+    [HttpGet("{subjectId:int}/grades/")]
+    public async Task<ActionResult<List<StudentGrade>>> GetGrade(int subjectId, int grade)
+    {
+        return await _db.StudentGrades.Where(g => g.SubjectId == subjectId).ToListAsync();
+    }
 }

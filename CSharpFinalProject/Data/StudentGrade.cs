@@ -2,15 +2,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CSharpFinalProject.Data;
 
-[Table("SubjectsMembers")]
-public class SubjectMember
+[Table("StudentsGrades")]
+public class StudentGrade
 {
     public int Id { get; set; }
     public int UserId { get; set; }
     public int SubjectId { get; set; }
-    public SubjectMemberRole Role { get; set; }
-
-    public User User { get; set; } = null!;
-
-    public Subject Subject { get; set; } = null!;
+    public double Grade { get; set; }
+    public string? Note { get; set; }
+    public DateTime Date { get; set; }
 }

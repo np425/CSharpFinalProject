@@ -1,7 +1,10 @@
 @page "/subject/{Id:int}"
 @using CSharpFinalProject.Data
+@using Radzen.Blazor.Rendering
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
+
+@* TODO: Grids everywhere to validate CRUD api working *@
 
 <h3>Subject</h3>
 
@@ -30,7 +33,15 @@
     </ul>
 }
 
+
+@* <RadzenScheduler @ref="@_scheduler" style="height: 768px;" TItem="Appointment"> *@
+@*     <RadzenMonthView /> *@
+@*     <RadzenYearView /> *@
+@* </RadzenScheduler> *@
+
 @code {
+
+    // private RadzenScheduler<Appointment> _scheduler;
 
     [Parameter]
     public int Id { get; set; }
