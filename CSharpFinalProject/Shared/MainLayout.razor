@@ -1,5 +1,4 @@
-﻿@using CSharpFinalProject.Authentication
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider authStateProvider;
 @inject NavigationManager navManager;
 
@@ -13,18 +12,18 @@
                 <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"/>
                 <RadzenLabel Text="Grades System"/>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10">
-                <AuthorizeView>
-                    <Authorized>
-                        <RadzenLabel Text="@context.User.Identity.Name"></RadzenLabel>
-                        <RadzenLink Path="logout" Text="Logout" class="rz-mr-5"></RadzenLink>
-                    </Authorized>
-                    <NotAuthorized>
-                        <RadzenLabel Text="Hello Guest"></RadzenLabel>
-                        <RadzenLink Path="login" Text="Login" class="rz-mr-5"></RadzenLink>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </RadzenStack>
+            @* <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="10"> *@
+            @*     <AuthorizeView> *@
+            @*         <Authorized> *@
+            @*             <RadzenLabel Text="@context.User.Identity.Name"></RadzenLabel> *@
+            @*             <RadzenLink Path="logout" Text="Logout" class="rz-mr-5"></RadzenLink> *@
+            @*         </Authorized> *@
+            @*         <NotAuthorized> *@
+            @*             <RadzenLabel Text="Hello Guest"></RadzenLabel> *@
+            @*             <RadzenLink Path="login" Text="Login" class="rz-mr-5"></RadzenLink> *@
+            @*         </NotAuthorized> *@
+            @*     </AuthorizeView> *@
+            @* </RadzenStack> *@
         </RadzenRow>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
@@ -74,12 +73,4 @@
 @code {
 
     bool sidebarExpanded = false;
-
-    private async Task Logout()
-    {
-        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(null);
-        navManager.NavigateTo("/", true);
-    }
-
 }

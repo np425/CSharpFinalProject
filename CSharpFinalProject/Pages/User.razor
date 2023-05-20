@@ -1,0 +1,22 @@
+@page "/user/{Id:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<h3>User</h3>
+
+<a>You're at id: @Id</a>
+<a>Username: @_user?.Username </a>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Data.User? _user;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _user = await HttpClient.GetFromJsonAsync<Data.User>(NavigationManager.BaseUri + $"api/users/{Id}");
+    }
+
+}

@@ -1,0 +1,47 @@
+@page "/subject/{Id:int}"
+@using CSharpFinalProject.Data
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<h3>Subject</h3>
+
+<a>You're at id: @Id</a>
+<a>Subject name @_subject?.Name </a>
+
+<h3>Teachers</h3>
+@if (_members.Count != 0)
+{
+    <ul>
+        @foreach (var member in _members.Where(member => member.Role == SubjectMemberRole.Teacher))
+        {
+            <li>@member.User.Username</li>
+        }
+    </ul>
+}
+
+<h3>Students</h3>
+@if (_members.Count != 0)
+{
+    <ul>
+        @foreach (var user in _members.Where(member => member.Role == SubjectMemberRole.Student))
+        {
+            <li>@user.User.Username</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Data.Subject? _subject;
+    private List<Data.SubjectMember> _members = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _subject = await HttpClient.GetFromJsonAsync<Data.Subject>(NavigationManager.BaseUri + $"api/subjects/{Id}");
+        _members = await HttpClient.GetFromJsonAsync<List<Data.SubjectMember>>(NavigationManager.BaseUri + $"api/subjects/{Id}/members") ?? _members;
+    }
+
+}

@@ -1,19 +1,17 @@
-using CSharpFinalProject.Authentication;
 using CSharpFinalProject.Data;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+// using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthenticationCore();
+// builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddSingleton<UserAccountService>();
+// builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddSingleton<UserService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddSqlite<GradeSystemStoreContext>("Data Source=db.sqlite");
 
 var app = builder.Build();
 
@@ -30,5 +28,17 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<GradeSystemStoreContext>();
+    if (db.Database.EnsureCreated())
+    {
+        SeedData.Initialize(db);
+    }
+}
 
 app.Run();
