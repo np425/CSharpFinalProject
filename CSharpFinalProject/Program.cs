@@ -9,8 +9,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 // builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddSingleton<WeatherForecastService>();
-
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<DataQueryApiService>();
+
 builder.Services.AddSqlite<GradeSystemStoreContext>("Data Source=db.sqlite");
 
 var app = builder.Build();

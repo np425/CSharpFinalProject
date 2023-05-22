@@ -44,10 +44,49 @@ public class UsersController
                 select new SubjectWithMemberRole
                 {
                     Subject = subject,
-                    MemberRole = member.Role
+                    UserRole = member.Role
                 })
             .ToListAsync();
 
         return result;
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult?> PostUser([FromBody]User user)
+    {
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        return null;
+    }
+
+    [HttpPut("{userId:int}")]
+    public async Task<ActionResult?> PutUser(int userId, [FromBody]User user)
+    {
+        if (userId != user.Id)
+        {
+            return null;
+        }
+
+        _db.Entry(user).State = EntityState.Modified;
+
+        await _db.SaveChangesAsync();
+        
+        return null;
+    }
+
+    [HttpDelete("{userId:int}")]
+    public async Task<ActionResult?> DeleteUser(int userId)
+    {
+        var item = await _db.Users.FindAsync(userId);
+        if (item == null)
+        {
+            return null;
+        }
+
+        _db.Users.Remove(item);
+        await _db.SaveChangesAsync();
+
+        return null;
     }
 }

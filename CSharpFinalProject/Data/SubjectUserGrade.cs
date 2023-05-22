@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CSharpFinalProject.Data;
 
-[Table("StudentsGrades")]
-public class StudentGrade
+[Table("SubjectsUsersGrades")]
+public class SubjectUserGrade
 {
     public int Id { get; set; }
     public int UserId { get; set; }

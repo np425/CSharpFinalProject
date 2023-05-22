@@ -1,0 +1,138 @@
+@page "/Subjects"
+@using CSharpFinalProject.Data
+@inject NavigationManager NavigationManager
+@inject DataQueryApiService DataQueryApiService
+<h3>Subjects</h3>
+
+<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Subject" Click="@InsertRow" Disabled="@(_subjectToInsert != null || _subjectToUpdate != null)" />
+<RadzenDataGrid @ref="_grid" IsLoading="@_isLoading" Count="@_subjects.Count" Data="@_subjects" LoadData="@LoadData" Style="max-height: 50%"
+                TItem="Data.Subject" GridLines="DataGridGridLines.Both" EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdateRow" RowCreate="OnCreateRow">
+    <Columns>
+        <RadzenDataGridColumn TItem="Data.Subject" Property="Id" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center"/>
+        <RadzenDataGridColumn TItem="Data.Subject" Property="Name" Title="Name" Frozen="true" Width="160px">
+            <EditTemplate Context="subject">
+                <RadzenTextBox @bind-Value="subject.Name" Style="width: 100%"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Data.Subject" Property="Description" Title="Description" Width="500px">
+            <EditTemplate Context="subject">
+                <RadzenTextBox @bind-Value="subject.Description" Style="width: 100%"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Data.Subject" Context="subject" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="subject">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(_ => EditRow(subject))" @onclick:stopPropagation="true">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(subject))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+            <EditTemplate Context="subject">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((_) => SaveRow(subject))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((_) => CancelEdit(subject))">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(subject))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private RadzenDataGrid<Data.Subject> _grid = null!;
+    private List<Data.Subject> _subjects = new();
+    private bool _isLoading;
+    private Data.Subject? _subjectToUpdate;
+    private Data.Subject? _subjectToInsert;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _isLoading = true;
+        _subjects = await DataQueryApiService.GetQueryDataListAsync<Data.Subject>(NavigationManager.BaseUri + "api/subjects", new DataQueryApiArgs()) ?? _subjects;
+        _isLoading = false;
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        _isLoading = true;
+
+        var apiArgs = DataQueryApiArgsConversions.FromLoadDataArgs(args);
+
+        _subjects = await DataQueryApiService.GetQueryDataListAsync<Data.Subject>(NavigationManager.BaseUri + "api/subjects", apiArgs) ?? _subjects;
+
+        _isLoading = false;
+    }
+
+    async Task EditRow(Data.Subject subject)
+    {
+        _subjectToUpdate = subject;
+        await _grid.EditRow(subject);
+    }
+
+    async Task OnUpdateRow(Data.Subject subject)
+    {
+        if (subject == _subjectToInsert)
+        {
+            _subjectToInsert = null;
+        }
+
+        _subjectToUpdate = null;
+        await DataQueryApiService.UpdateQueryDataItem(NavigationManager.BaseUri + $"api/subjects/{subject.Id}", subject);
+    }
+
+    async Task SaveRow(Data.Subject subject)
+    {
+        _isLoading = true;
+        await _grid.UpdateRow(subject);
+        _isLoading = false;
+    }
+
+    void CancelEdit(Data.Subject subject)
+    {
+        _subjectToUpdate = null;
+        _grid.CancelEditRow(subject);
+    }
+
+    async Task DeleteRow(Data.Subject subject)
+    {
+        _isLoading = true;
+        if (subject == _subjectToInsert)
+        {
+            _subjectToInsert = null;
+        }
+
+        if (subject == _subjectToUpdate)
+        {
+            _subjectToUpdate = null;
+        }
+
+        if (_subjects.Contains(subject))
+        {
+            await DataQueryApiService.DeleteQueryDataItem(NavigationManager.BaseUri + $"api/subjects/{subject.Id}");
+        }
+        else
+        {
+            _grid.CancelEditRow(subject);
+        }
+        
+        await _grid.Reload();
+        _isLoading = false;
+    }
+
+    async Task InsertRow()
+    {
+        _subjectToInsert = new Data.Subject();
+        await _grid.InsertRow(_subjectToInsert);
+    }
+
+    async Task OnCreateRow(Data.Subject subject)
+    {
+        await DataQueryApiService.CreateQueryDataItem(NavigationManager.BaseUri + "api/subjects/", subject);
+        _subjectToInsert = null;
+        await _grid.Reload();
+    }
+
+
+}

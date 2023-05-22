@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace CSharpFinalProject.Data;
 
+[Table("Subjects")]
 public class Subject
 {
     // public Subject(int id, int classId)
