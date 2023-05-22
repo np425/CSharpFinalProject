@@ -44,7 +44,7 @@ public class UsersController
                 select new SubjectWithMemberRole
                 {
                     Subject = subject,
-                    UserRole = member.Role
+                    MemberRole = member.Role
                 })
             .ToListAsync();
 

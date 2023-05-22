@@ -12,13 +12,10 @@ public class GradeSystemStoreContext: DbContext
     
     public DbSet<User> Users { get; set; }
     
-    public DbSet<SubjectUserGrade> StudentGrades { get; set; }
-    
     public DbSet<SubjectUser> SubjectsMembers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
     }
 }

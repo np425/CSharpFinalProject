@@ -1,0 +1,148 @@
+﻿@using CSharpFinalProject.Data
+@inject NavigationManager NavigationManager
+@inject DataQueryApiService DataQueryApiService
+
+<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Student" Click="@InsertRow" Disabled="@(_studentToInsert != null || _studentToUpdate != null)" />
+<RadzenDataGrid @ref="_grid" IsLoading="@_isLoading" Count="@_students.Count" Data="@_students" LoadData="@LoadData" Style="max-height: 50%"
+                TItem="Student" GridLines="DataGridGridLines.Both" EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdateRow" RowCreate="OnCreateRow">
+    <Columns>
+        <RadzenDataGridColumn TItem="Student" Property="Id" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Student" Property="Username" Title="Username" Frozen="true" Width="160px">
+            <EditTemplate Context="student">
+                <RadzenDropDown @bind-Value="student.Id" Data="@_users" ValueProperty="Id" Style="width: 100%">
+                    <Template Context="user">
+                        [@user.Id] @user.Username
+                    </Template>
+                </RadzenDropDown>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Student" Property="Email" Title="Email" Width="500px">
+            @*
+            <EditTemplate Context="student">
+                <RadzenText Text="@student.Email"></RadzenText>
+            </EditTemplate>
+        *@
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Student" Context="student" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="student">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(_ => EditRow(student))" @onclick:stopPropagation="true">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(student))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+            <EditTemplate Context="student">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(_ => SaveRow(student))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => CancelEdit(student))">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(student))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public Subject? Subject { get; set; }
+    
+    private RadzenDataGrid<Student> _grid = null!;
+    private List<Student> _students = new();
+    private List<User> _users = new();
+    private bool _isLoading;
+    private Student? _studentToUpdate;
+    private Student? _studentToInsert;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _isLoading = true;
+        _students = await DataQueryApiService.GetQueryDataListAsync<Student>(NavigationManager.BaseUri + $"api/subjects/{Subject?.Id}/students", new DataQueryApiArgs()) ?? _students;
+        _users = await DataQueryApiService.GetQueryDataListAsync<User>(NavigationManager.BaseUri + "api/users", new DataQueryApiArgs()) ?? _users;
+        _isLoading = false;
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        _isLoading = true;
+
+        var apiArgs = DataQueryApiArgsConversions.FromLoadDataArgs(args);
+
+        _students = await DataQueryApiService.GetQueryDataListAsync<Student>(NavigationManager.BaseUri + $"api/subjects/{Subject?.Id}/students", apiArgs) ?? _students;
+        _users = await DataQueryApiService.GetQueryDataListAsync<User>(NavigationManager.BaseUri + "api/users", new DataQueryApiArgs()) ?? _users;
+
+        _isLoading = false;
+    }
+
+    async Task EditRow(Student student)
+    {
+        _studentToUpdate = student;
+        await _grid.EditRow(student);
+    }
+
+    async Task OnUpdateRow(Student student)
+    {
+        if (student == _studentToInsert)
+        {
+            _studentToInsert = null;
+        }
+
+        _studentToUpdate = null;
+        await DataQueryApiService.UpdateQueryDataItem(NavigationManager.BaseUri + $"api/subjects/{Subject?.Id}/members/{student.MemberId}", student);
+    }
+
+    async Task SaveRow(Student student)
+    {
+        _isLoading = true;
+        await _grid.UpdateRow(student);
+        _isLoading = false;
+    }
+
+    void CancelEdit(Student student)
+    {
+        _studentToUpdate = null;
+        _studentToInsert = null;
+        _grid.CancelEditRow(student);
+    }
+
+    async Task DeleteRow(Student student)
+    {
+        _isLoading = true;
+        if (student == _studentToInsert)
+        {
+            _studentToInsert = null;
+        }
+
+        if (student == _studentToUpdate)
+        {
+            _studentToUpdate = null;
+        }
+
+        if (_students.Contains(student))
+        {
+            await DataQueryApiService.DeleteQueryDataItem(NavigationManager.BaseUri + $"api/subjects/{Subject?.Id}/members/{student.MemberId}");
+        }
+        else
+        {
+            _grid.CancelEditRow(student);
+        }
+        
+        await _grid.Reload();
+        _isLoading = false;
+    }
+
+    async Task InsertRow()
+    {
+        _studentToInsert = new Student();
+        await _grid.InsertRow(_studentToInsert);
+    }
+
+    async Task OnCreateRow(Student student)
+    {
+        await DataQueryApiService.CreateQueryDataItem(NavigationManager.BaseUri + $"api/subjects/{Subject?.Id}/members", student);
+        _studentToInsert = null;
+        await _grid.Reload();
+    }
+}

@@ -1,6 +1,8 @@
 using CSharpFinalProject.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 
 namespace CSharpFinalProject.Controllers;
 
@@ -29,7 +31,7 @@ public class SubjectsController
         // {
         //     query = query.Take(args.Top.Value);
         // }
-        
+
         return await query.ToListAsync();
     }
 
@@ -40,8 +42,9 @@ public class SubjectsController
         return await _db.Subjects.FindAsync(subjectId);
     }
 
+
     [HttpPost]
-    public async Task<ActionResult?> PostSubject([FromBody]Subject subject)
+    public async Task<ActionResult?> PostSubject([FromBody] Subject subject)
     {
         _db.Subjects.Add(subject);
         await _db.SaveChangesAsync();
@@ -49,8 +52,9 @@ public class SubjectsController
         return null;
     }
 
+
     [HttpPut("{subjectId:int}")]
-    public async Task<ActionResult?> PutSubject(int subjectId, [FromBody]Subject subject)
+    public async Task<ActionResult?> PutSubject(int subjectId, [FromBody] Subject subject)
     {
         if (subjectId != subject.Id)
         {
@@ -60,7 +64,7 @@ public class SubjectsController
         _db.Entry(subject).State = EntityState.Modified;
 
         await _db.SaveChangesAsync();
-        
+
         return null;
     }
 
@@ -79,25 +83,96 @@ public class SubjectsController
         return null;
     }
 
-    [HttpGet("{subjectId:int}/members")]
-    public async Task<ActionResult<List<SubjectUser>>> GetMembers(int subjectId)
+    #region Subject Members
+
+    [HttpGet("{subjectId:int}/students")]
+    public async Task<ActionResult<List<Student>>> GetStudents(int subjectId)
     {
-        var subjectsMembers = _db.SubjectsMembers;
+        Console.WriteLine(await _db.SubjectsMembers.CountAsync());
 
-        var foundMembers = await (from member in subjectsMembers
-                where member.SubjectId == subjectId
-                select member)
-            .Include(member => member.User)
-            .ToListAsync();
+        var query = from member in _db.SubjectsMembers
+            join user in _db.Users on member.UserId equals user.Id
+            where member.SubjectId == subjectId && member.Role == SubjectMemberRole.Student
+            select new Student
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                MemberId = member.Id
+            };
 
-        foundMembers.ForEach(m => Console.WriteLine(m.Role));
-
-        return foundMembers;
+        return await query.ToListAsync();
     }
 
-    [HttpGet("{subjectId:int}/grades/")]
-    public async Task<ActionResult<List<SubjectUserGrade>>> GetGrade(int subjectId, int grade)
+    [HttpGet("{subjectId:int}/teachers")]
+    public async Task<ActionResult<List<Teacher>>> GetTeachers(int subjectId)
     {
-        return await _db.StudentGrades.Where(g => g.SubjectId == subjectId).ToListAsync();
+        var query = from member in _db.SubjectsMembers
+            join user in _db.Users on member.UserId equals user.Id
+            where member.SubjectId == subjectId && member.Role == SubjectMemberRole.Teacher
+            select new Teacher
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                MemberId = member.Id
+            };
+
+        return await query.ToListAsync();
     }
+
+    [HttpPost("{subjectId:int}/members")]
+    public async Task<ActionResult?> PostMember(int subjectId, [FromBody] SubjectMember member)
+    {
+        var newItem = new SubjectUser
+        {
+            SubjectId = subjectId,
+            Role = member.MemberRole,
+            UserId = member.Id
+        };
+
+        _db.SubjectsMembers.Add(newItem);
+        await _db.SaveChangesAsync();
+
+        return null;
+    }
+
+    [HttpPut("{subjectId:int}/members/{memberId:int}")]
+    public async Task<ActionResult?> PutMember(int subjectId, int memberId, [FromBody] SubjectMember member)
+    {
+        if (memberId != member.MemberId)
+        {
+            return null;
+        }
+
+        var item = await _db.SubjectsMembers.FindAsync(memberId);
+        if (item == null) return null;
+
+        item.UserId = member.Id;
+        item.Role = member.MemberRole;
+        item.SubjectId = subjectId;
+
+        _db.Entry(item).State = EntityState.Modified;
+
+        await _db.SaveChangesAsync();
+
+        return null;
+    }
+
+    [HttpDelete("{subjectId:int}/members/{memberId:int}")]
+    public async Task<ActionResult?> DeleteMember(int subjectId, int memberId)
+    {
+        var item = await _db.SubjectsMembers.FindAsync(memberId);
+        if (item == null)
+        {
+            return null;
+        }
+
+        _db.SubjectsMembers.Remove(item);
+        await _db.SaveChangesAsync();
+
+        return null;
+    }
+
+    #endregion
 }

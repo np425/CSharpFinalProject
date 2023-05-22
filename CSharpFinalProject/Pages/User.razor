@@ -12,7 +12,7 @@
 @if (_subjectsWithMemberRoles.Count != 0)
 {
     <ul>
-        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.UserRole == SubjectUserRole.Student))
+        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.MemberRole == SubjectMemberRole.Student))
         {
             <li>@subject.Subject.Name</li>
         }
@@ -23,7 +23,7 @@
 @if (_subjectsWithMemberRoles.Count != 0)
 {
     <ul>
-        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.UserRole == SubjectUserRole.Teacher))
+        @foreach (var subject in _subjectsWithMemberRoles.Where(s => s.MemberRole == SubjectMemberRole.Teacher))
         {
             <li>@subject.Subject.Name</li>
         }
