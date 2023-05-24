@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ApiData\ApiData.csproj" />
     <ProjectReference Include="..\Backend\Backend.csproj" />
   </ItemGroup>
