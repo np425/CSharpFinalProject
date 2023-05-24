@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpFinalProject", "CSharpFinalProject\CSharpFinalProject.csproj", "{A01DE199-A403-480E-A536-F286F5E94DEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFrontend", "BlazorFrontend\BlazorFrontend.csproj", "{A01DE199-A403-480E-A536-F286F5E94DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{FD79486A-684E-4544-8E0D-341641EF3E4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiData", "ApiData\ApiData.csproj", "{D2AEBF63-CBCF-4BFE-86DF-EE6F60DEA44C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +22,13 @@ Global
 		{A01DE199-A403-480E-A536-F286F5E94DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A01DE199-A403-480E-A536-F286F5E94DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A01DE199-A403-480E-A536-F286F5E94DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD79486A-684E-4544-8E0D-341641EF3E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD79486A-684E-4544-8E0D-341641EF3E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD79486A-684E-4544-8E0D-341641EF3E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD79486A-684E-4544-8E0D-341641EF3E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2AEBF63-CBCF-4BFE-86DF-EE6F60DEA44C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2AEBF63-CBCF-4BFE-86DF-EE6F60DEA44C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2AEBF63-CBCF-4BFE-86DF-EE6F60DEA44C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2AEBF63-CBCF-4BFE-86DF-EE6F60DEA44C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

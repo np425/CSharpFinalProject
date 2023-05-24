@@ -1,0 +1,37 @@
+@using ApiData.Models
+@using BlazorFrontend.Services
+@inject NavigationManager NavigationManager
+
+<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New User" Click="@InsertRow" Disabled="@(_userToInsert != null || _userToUpdate != null)" />
+<RadzenDataGrid @ref="_grid" IsLoading="@_isLoading" Count="@Users.Count" Data="@Users" LoadData="@LoadData" Style="max-height: 50%"
+                TItem="UserDto" GridLines="DataGridGridLines.Both" EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdateRow" RowCreate="OnCreateRow">
+    <Columns>
+        <RadzenDataGridColumn TItem="UserDto" Property="Id" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center"/>
+        <RadzenDataGridColumn TItem="UserDto" Property="Username" Title="Username" Frozen="true" Width="160px">
+            <EditTemplate Context="user">
+                <RadzenTextBox @bind-Value="user.Username" Style="width: 100%"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="UserDto" Property="Email" Title="Email" Width="500px">
+            <EditTemplate Context="user">
+                <RadzenTextBox @bind-Value="user.Email" Style="width: 100%"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="UserDto" Context="user" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="user">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(_ => EditRow(user))" @onclick:stopPropagation="true">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(user))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+            <EditTemplate Context="user">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((_) => SaveRow(user))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((_) => CancelEdit(user))">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(_ => DeleteRow(user))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
